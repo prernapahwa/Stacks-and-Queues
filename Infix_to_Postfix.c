@@ -13,7 +13,7 @@
 #include<stdlib.h>
 
 char *stack;
-int top = -1;//when stack is empty
+int top = 0;//when stack is empty
 int size = 1;
 
 
@@ -29,24 +29,26 @@ void push(char value) {
     if(top == size ) {
         increase_size();
     }
-    stack[++top] = value;
+    stack[top++] = value;
 }
 
 //remove top element and return
 
-char pop() {
-    if(top > -1) {
-        return stack[top--];
+char pop(){
+    if(top == 0) {
+        return -1;
     }
+    return stack[top--];
 }
 
 
 // only returns top element of stack
 
 char peek() {
-    if(top > -1) {
-        return stack[top];
+    if(top == 0) {
+        return -1;
     }
+    return stack[top - 1];
 }
 
 //return integer precedence of given operator
@@ -72,7 +74,7 @@ void postfix(char * str) {
             ans[index++] = str[i];
         }
         else if(str[i] == '/' || str[i] == '*' || str[i] == '-' || str [i] == '+') {
-            while(size != -1 && precedence(str[i]) <= precedence(peek())) {
+            while(top != 0 && precedence(str[i]) <= precedence(peek())) {
                 ans[index++] = peek();
                 pop();
             }
@@ -85,14 +87,15 @@ void postfix(char * str) {
         else if(str[i] == ')') {
             //keep poping top element till closing bracket
             while(peek() != '(') {
-                ans[index++] = peek();
+                ans[index++] = peek(); 
                 pop();
             }
             pop();
         }
     }
-    while(top != -1) {
-        ans[index++] = pop();
+    while(top != 0) {
+        ans[index++] = peek(); 
+        pop();
     }
     
     //setting last element of ans to null
@@ -102,6 +105,7 @@ void postfix(char * str) {
 }
 
 int main() {
+    stack = (char *) malloc(sizeof(char));
 	char str[100];
 	scanf("%s",str);
 	
