@@ -1,115 +1,91 @@
-/**
- * Program to convert an arithmetic expression from infix to postfix
- * 
- * @Prerna(1910990964)
- * 
- * Assignment_4 - Stacks and Queues
+/*Program to checCk Balanced Parantheses
  *
+ *@Prerna(1910990964)
+ *Assignment-4-Stacks and Queues
  */
- 
 
-#include <stdio.h>
-#include<string.h>
+#include<stdio.h>
+#include<stdbool.h>
 #include<stdlib.h>
 
 char *stack;
-int top = 0;//when stack is empty
+int top = -1;//stack is empty
 int size = 1;
 
-
+//function to increase size to 2 * initial size.
+//
 void increase_size() {
     size = size * 2;
+    //printf("SIZE %d \n",size);
     stack = realloc(stack, size * sizeof(char));
 }
 
-// add element to the stack 
-// if stack is full increase size of the stack to push more elements
-
 void push(char value) {
-    if(top == size ) {
+    if(top == size) {
+        //have to increase size.
         increase_size();
     }
-    stack[top++] = value;
+    stack[++top] = value;
 }
 
 //remove top element and return
-
-char pop(){
-    if(top == 0) {
-        return -1;
+char pop() {
+    if(top > -1) {
+        return stack[top--];
     }
-    return stack[top--];
 }
 
-
-// only returns top element of stack
-
+//only returns top element of the stack
 char peek() {
-    if(top == 0) {
-        return -1;
-    }
-    return stack[top - 1];
-}
-
-//return integer precedence of given operator
-int precedence(char ch) {
-    if(ch == '/' || ch == '*') {
-        return 2;
-    }
-    else if(ch == '+' || ch == '-') {
-        return 1;
-    }
-    else {
-        return -1;
+    if(top > -1) {
+        return stack[top];
     }
 }
 
-void postfix(char * str) {
-    
-    char ans[100];
-    int index = 0; // index to be updated when we insert in the answer string
-    
-    for(int i = 0; str[i] != '\0'; i++) {
-        if(str[i] >= '0' && str[i] <= '9') {
-            ans[index++] = str[i];
+
+bool balanced(char *str) {
+    int i = 0;
+    while(str[i] != '\0') {
+       // printf("%c ",str[i]);
+        if(str[i] == '(' || str[i] == '{' || str[i] == '[') {
+            push(str[i]);
+            //printf("%c",str[i]);
         }
-        else if(str[i] == '/' || str[i] == '*' || str[i] == '-' || str [i] == '+') {
-            while(top != 0 && precedence(str[i]) <= precedence(peek())) {
-                ans[index++] = peek();
-                pop();
+        else if(top >= 0){
+            //printf("%c",str[i]);
+            if(str[i] == ')' && peek() != '(') {
+                return false;
             }
-            
-            push(str[i]);
-        }
-        else if(str[i] == '(') {
-            push(str[i]);
-        }
-        else if(str[i] == ')') {
-            //keep poping top element till closing bracket
-            while(peek() != '(') {
-                ans[index++] = peek(); 
-                pop();
+            else if(str[i] == ']' && peek() != '[') {
+                return false;
+            }
+            else if(str[i] == '}' && peek() != '{') {
+                return false;
             }
             pop();
         }
+        else {
+            return false;
+        }
+
+        i++;
     }
-    while(top != 0) {
-        ans[index++] = peek(); 
-        pop();
+    if(top == -1) {
+        return true;
     }
-    
-    //setting last element of ans to null
-    
-    ans[index++] = '\0';
-    printf("%s",ans);
+    return false;
 }
 
 int main() {
     stack = (char *) malloc(sizeof(char));
-	char str[100];
-	scanf("%s",str);
-	
-	postfix(str);
-	return 0;
+    char str[20];
+    gets(str);
+    //printf("%s",str);
+    bool ans = balanced(str);
+    if(ans == true) {
+        printf("True\n");
+    }
+    else {
+        printf("False\n");
+    }
 }
-
